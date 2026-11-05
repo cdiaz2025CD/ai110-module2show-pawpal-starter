@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
-from datetime import date
+from dataclasses import dataclass, field, replace
+from datetime import date, timedelta
 
 
 @dataclass
@@ -76,4 +76,68 @@ class Scheduler:
                 plan.append(task)
                 remaining_minutes -= task.duration
 
-        return sorted(plan, key=lambda task: task.time)
+        return self.sort_by_time(plan)
+
+    def sort_by_time(self, tasks: list[Task]) -> list[Task]:
+        """Return tasks in chronological order."""
+        return sorted(tasks, key=lambda task: (task.due_date, task.time))
+
+    def filter_tasks(
+        self,
+        pet_name: str | None = None,
+        completed: bool | None = None,
+    ) -> list[Task]:
+        """Return tasks that match the selected pet and completion status."""
+        tasks = []
+
+        for pet in self.owner.pets:
+            if pet_name is not None and pet.name != pet_name:
+                continue
+
+            for task in pet.tasks:
+                if completed is None or task.completed == completed:
+                    tasks.append(task)
+
+        return tasks
+    
+    def mark_task_complete(self, pet: Pet, task: Task) -> Task | None:
+        """Complete a task and add its next occurrence if it repeats."""
+        if task.completed:
+            return None
+
+        task.mark_complete()
+        days_until_next = {"daily": 1, "weekly": 7}.get(task.frequency)
+
+        if days_until_next is None:
+            return None
+
+        next_task = replace(
+            task,
+            due_date=date.today() + timedelta(days=days_until_next),
+            completed=False,
+        )
+        pet.add_task(next_task)
+        return next_task
+
+    def detect_conflicts(self) -> list[str]:
+        """Warn when unfinished tasks share a date and start time."""
+        first_task_by_slot = {}
+        warnings = []
+
+        for pet in self.owner.pets:
+            for task in pet.tasks:
+                if task.completed:
+                    continue
+
+                slot = (task.due_date, task.time)
+                label = f"{pet.name}: {task.description}"
+
+                if slot in first_task_by_slot:
+                    warnings.append(
+                        f"{task.due_date} at {task.time} - "
+                        f"{first_task_by_slot[slot]} conflicts with {label}."
+                    )
+                else:
+                    first_task_by_slot[slot] = label
+
+        return warnings

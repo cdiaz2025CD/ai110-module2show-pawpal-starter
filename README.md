@@ -57,7 +57,7 @@ Today's Schedule
 
 ```bash
 # Run the full test suite:
-pytest
+py -m pytest
 
 # Run with coverage:
 pytest --cov
@@ -66,28 +66,37 @@ pytest --cov
 Sample test output:
 
 ```text
-2 passed in 0.08s
+Today's Schedule
+08:00 - Breakfast (5 min)
+08:30 - Morning walk (25 min)
+17:00 - Play time (10 min)
+
+Mochi's unfinished tasks:
+08:30 - Morning walk
+17:00 - Play time
+
+Next Morning walk: 2026-11-06
+Warning: 2026-11-05 at 17:00 - Mochi: Play time conflicts with Luna: Dinner.
 ```
 
 ## 📐 Smarter Scheduling
 
 > Fill in once you've implemented scheduling logic.
 
-| Feature | Method(s) | Notes |
-|---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Feature | Method | Behavior |
+|---|---|---|
+| Sorting | `sort_by_time()` | Orders tasks by due date, then start time. |
+| Filtering | `filter_tasks()` | Filters tasks by pet name, completion status, or both. |
+| Conflict detection | `detect_conflicts()` | Warns when unfinished tasks share the same date and start time. |
+| Recurring tasks | `mark_task_complete()` | Creates the next occurrence when a daily or weekly task is completed. |
 
 ## 📸 Demo Walkthrough
 
 Describe your app in numbered steps so a reader can follow along without watching a video:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+1. Open PawPal+, enter a pet name, choose its species, and click **Add pet**.
+2. Select the pet, enter a task title, time, duration, and priority, then choose how often it repeats. Click **Add task**.
+3. Enter your available minutes and click **Generate schedule**. PawPal+ considers higher-priority tasks first, then displays the tasks that fit in chronological order. It warns you if unfinished tasks share a start time on the same date.
+4. Select a task and click **Mark complete**. Completing a daily or weekly task creates its next occurrence. Use **Show tasks** to switch between all, pending, and completed tasks.
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->

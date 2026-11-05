@@ -19,6 +19,19 @@ def main():
     for task in scheduler.generate_plan():
         print(f"{task.time} - {task.description} ({task.duration} min)")
 
+    print("\nMochi's unfinished tasks:")
+    mochi_tasks = scheduler.filter_tasks(pet_name="Mochi", completed=False)
+    for task in scheduler.sort_by_time(mochi_tasks):
+        print(f"{task.time} - {task.description}")
+
+    next_walk = scheduler.mark_task_complete(dog, dog.tasks[0])
+    if next_walk is not None:
+        print(f"\nNext {next_walk.description}: {next_walk.due_date}")
+        cat.add_task(Task("Dinner", "17:00", 5, 1))
+
+    for warning in scheduler.detect_conflicts():
+        print(f"Warning: {warning}")
+
 
 if __name__ == "__main__":
     main()
